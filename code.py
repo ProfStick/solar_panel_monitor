@@ -11,27 +11,36 @@ i2c_bus = busio.I2C(SCL, SDA)
 
 ina219 = adafruit_ina219.INA219(i2c_bus)
 
-vbat_voltage = analogio.AnalogIn(board.D9) # lipo battery pin
+vbat_voltage = analogio.AnalogIn(board.D9)  # lipo battery pin
 
 led = digitalio.DigitalInOut(board.D13)
 led.direction = digitalio.Direction.OUTPUT
 
-print("ina219 test")
+print("V, I, P, Vbat")
 
 while True:
-    led.value = True 
-    busVoltage = ina219.bus_voltage
-    shuntVoltage = ina219.shunt_voltage / 1000
-    loadVoltage = busVoltage + shuntVoltage
-    current = ina219.current
-    power = current * loadVoltage
-    batVoltage = (vbat_voltage.value * 3.3) / 65536 * 2
-    print("Bus Voltage:     {:.1f} V".format(busVoltage))
-    print("Shunt Voltage:   {:.1f} mV".format(shuntVoltage))
-    print("Load Voltage:    {:.1f} V".format(loadVoltage))
-    print("Current:         {:.1f} mA".format(current))
-    print("Power:           {:.1f} W\n".format(power))
-    print("Battery voltage: {:.1f} V\n".format(batVoltage))
+    arrayVolt = []
+    arrayCurrent = []
+    while len(arrayVolt) < 10:
+        led.value = True 
+        busVoltage = ina219.bus_voltage  # V
+        shuntVoltage = ina219.shunt_voltage  # V
+        voltage = busVoltage + shuntVoltage  # V
+        current = ina219.current  # mA
+        # power = current * loadVoltage  #mW
+        arrayVolt.append(voltage)
+        arrayCurrent.append(current)
+        time.sleep(0.5)
+        # led.value = False
+    
     led.value = False
     
-    time.sleep(2)
+    V = sum(arrayVolt)/len(arrayVolt)
+    I = sum(arrayCurrent)/len(arrayCurrent)
+    P = V * I
+
+    batVoltage = (vbat_voltage.value * 3.3) / 65536 * 2
+
+    print("{:.2f}, {:.2f}, {:.2f}, {:.1f}".format(V, I, P, batVoltage))
+        
+    time.sleep(5)
