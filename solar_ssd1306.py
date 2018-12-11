@@ -150,6 +150,7 @@ class SSD1306_I2C(_SSD1306):
         self.i2c_device = solar_i2c_device.I2CDevice(i2c, addr)
         self.addr = addr
         self.temp = bytearray(2)
+        self.txt_array = ["","",""]
         # Add an extra byte to the data buffer to hold an I2C data/command byte
         # to use hardware-compatible I2C transactions.  A memoryview of the
         # buffer is used to mask this byte from the framebuffer operations
